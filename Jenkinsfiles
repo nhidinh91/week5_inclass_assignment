@@ -2,14 +2,16 @@ pipeline {
     agent any
 
     environment {
-        SONARQUBE_SERVER = 'SonarQubeServer'  // The name of the SonarQube server configured in Jenkins
-        SONAR_TOKEN = 'sqa_54c4ceb0ea69276981c844021664899db708e60d' // Store the token securely
+        SONARQUBE_SERVER = 'SonarQubeServer' // The name of the SonarQube server configured in Jenkins
+        SONAR_TOKEN = 'sqa_188a3288067f74b2b6082cd741fd630e412bd187' // Store the token securely
+        DOCKER_IMAGE = 'thaonhi6991/inclass_assignment_week5'
+        DOCKER_TAG = 'latest'
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'master', url: 'https://github.com/ADirin/sep2_week5_inclass_s2.git'
+                git branch: 'main', url: 'https://github.com/nhidinh91/week5_inclass_assignment.git'
             }
         }
 
@@ -24,9 +26,9 @@ pipeline {
                 withSonarQubeEnv('SonarQubeServer') {
                     bat """
                         sonar-scanner ^
-                        -Dsonar.projectKey=devops-demo ^
+                        -Dsonar.projectKey=inclass-assignment-week5 ^
                         -Dsonar.sources=src ^
-                        -Dsonar.projectName=DevOps-Demo ^
+                        -Dsonar.projectName=InClass-Assignment-Week5 ^
                         -Dsonar.host.url=http://localhost:9000 ^
                         -Dsonar.login=${env.SONAR_TOKEN} ^
                         -Dsonar.java.binaries=target/classes
@@ -35,5 +37,26 @@ pipeline {
             }
         }
 
+        stage('Build Docker Image') {
+            steps {
+                script {
+                   if (isUnix()) {
+                        sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
+                    } else {
+                        bat "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
+                    }
+                }
+            }
+        }
+
+        stage('Push Docker Image to Docker Hub') {
+            steps {
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
+                        docker.image(DOCKER_IMAGE).push(DOCKER_TAG)
+                    }
+                }
+            }
+        }
     }
 }
