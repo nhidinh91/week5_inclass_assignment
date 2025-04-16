@@ -1,12 +1,12 @@
-# Use Maven image to build the project
-FROM maven:latest AS build
+# === Build Stage ===
+FROM maven:3.9.4-eclipse-temurin-21 AS build
 WORKDIR /app
-COPY . .
+COPY pom.xml .
+COPY src ./src
 RUN mvn clean package
 
-# Use a lightweight JDK image to run the app
-FROM openjdk:21
+# === Run Stage ===
+FROM eclipse-temurin:21-jdk
 WORKDIR /app
 COPY --from=build /app/target/untitled-1.0-SNAPSHOT.jar app.jar
-
 CMD ["java", "-jar", "app.jar"]
