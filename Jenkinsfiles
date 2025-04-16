@@ -4,7 +4,7 @@ pipeline {
     environment {
         SONARQUBE_SERVER = 'SonarQubeServer' // The name of the SonarQube server configured in Jenkins
         SONAR_TOKEN = 'sqa_188a3288067f74b2b6082cd741fd630e412bd187' // Store the token securely
-        DOCKER_IMAGE = 'thaonhi6991/inclass_assignment_week5'
+        DOCKER_IMAGE = 'thaonhi6991/week5_inclass_assignment'
         DOCKER_TAG = 'latest'
     }
 
@@ -41,9 +41,9 @@ pipeline {
             steps {
                 script {
                    if (isUnix()) {
-                        sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
+                        sh "docker build --no-cache -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
                     } else {
-                        bat "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
+                        bat "docker build --no-cache -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
                     }
                 }
             }
